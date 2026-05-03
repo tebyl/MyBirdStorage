@@ -4,18 +4,66 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Feather / bird silhouette -->
+
+    <!-- Legs -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FAF6EE"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M 50,76 L 44,84 M 64,76 L 68,84"/>
+
+    <!-- Perch / branch -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FAF6EE"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M 14,84 C 40,82 68,84 94,82"/>
+
+    <!-- Bird body silhouette:
+         Beak tip right → crown → nape → back → upper tail (raised left)
+         → lower tail arc → vent → belly → breast → lower beak → close -->
     <path
         android:fillColor="#FAF6EE"
-        android:pathData="M54,22 C54,22 36,42 36,62 C36,72 44,80 54,80 C64,80 72,72 72,62 C72,42 54,22 54,22Z"/>
+        android:pathData="
+            M 82,42
+            C 78,34 66,26 50,22
+            C 36,18 24,24 18,38
+            L 12,42
+            C 10,50 12,60 18,62
+            C 22,68 34,76 52,78
+            C 68,80 80,70 86,58
+            C 88,52 88,46 86,44
+            L 82,46
+            Z"/>
+
+    <!-- Wing fold — subtle dark accent line across mid-body -->
     <path
-        android:strokeColor="#FAF6EE"
-        android:strokeWidth="2"
         android:fillColor="#00000000"
-        android:pathData="M54,30 L54,80"/>
+        android:strokeColor="#3F4A2E"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M 34,58 C 48,54 64,54 76,58"/>
+
+    <!-- Eye (dark circle) -->
     <path
-        android:strokeColor="#FAF6EE"
-        android:strokeWidth="1.5"
-        android:fillColor="#00000000"
-        android:pathData="M46,45 C50,44 54,44 58,45 M44,55 C49,53 54,53 60,55 M45,65 C49,63 54,63 61,65"/>
+        android:fillColor="#3F4A2E"
+        android:pathData="
+            M 44,33
+            C 47,33 49,35.5 49,38
+            C 49,40.5 47,43 44,43
+            C 41,43 39,40.5 39,38
+            C 39,35.5 41,33 44,33
+            Z"/>
+
+    <!-- Eye highlight (tiny cream dot) -->
+    <path
+        android:fillColor="#FAF6EE"
+        android:pathData="
+            M 46,34.5
+            C 48,34.5 48,37 46,37
+            C 44,37 44,34.5 46,34.5
+            Z"/>
+
 </vector>
