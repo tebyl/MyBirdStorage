@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Feather / bird silhouette -->
+    <path
+        android:fillColor="#FAF6EE"
+        android:pathData="M54,22 C54,22 36,42 36,62 C36,72 44,80 54,80 C64,80 72,72 72,62 C72,42 54,22 54,22Z"/>
+    <path
+        android:strokeColor="#FAF6EE"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M54,30 L54,80"/>
+    <path
+        android:strokeColor="#FAF6EE"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M46,45 C50,44 54,44 58,45 M44,55 C49,53 54,53 60,55 M45,65 C49,63 54,63 61,65"/>
+</vector>

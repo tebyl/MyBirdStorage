@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_cream">#FAF6EE</color>
+    <color name="bg_warm">#FBF9F3</color>
+    <color name="ic_launcher_background">#3F4A2E</color>
+    <string name="app_name">Aviario Local</string>
+    <style name="Theme.AviarioLocal" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/bg_cream</item>
+        <item name="android:navigationBarColor">@color/bg_warm</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

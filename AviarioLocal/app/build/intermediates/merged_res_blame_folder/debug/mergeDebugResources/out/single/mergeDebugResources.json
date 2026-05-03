@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.tebyl.aviariolocal.app-debug-60:/xml_file_paths.xml.flat",
+        "source": "com.tebyl.aviariolocal.app-main-62:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.tebyl.aviariolocal.app-debug-60:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.tebyl.aviariolocal.app-main-62:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.tebyl.aviariolocal.app-debug-60:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.tebyl.aviariolocal.app-main-62:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.tebyl.aviariolocal.app-debug-60:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.tebyl.aviariolocal.app-main-62:/mipmap-anydpi-v26/ic_launcher.xml"
+    }
+]
