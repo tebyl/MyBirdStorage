@@ -220,7 +220,9 @@ private fun MapDetailCard(bird: Bird, onOpen: () -> Unit, onClose: () -> Unit) {
     ) {
         AsyncImage(
             model = bird.photoUri,
-            contentDescription = null,
+            contentDescription = bird.species
+                ?.let { "Foto de $it en ${bird.location}" }
+                ?: "Ave sin identificar en ${bird.location}",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(60.dp)

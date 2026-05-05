@@ -25,7 +25,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,8 +55,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
 import com.tebyl.aviariolocal.data.Bird
+import java.io.File
 import com.tebyl.aviariolocal.ui.components.AviarioChip
 import com.tebyl.aviariolocal.ui.components.FieldLabel
 import com.tebyl.aviariolocal.ui.components.paperBackground
@@ -72,22 +79,50 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(vm: BirdViewModel, onClose: () -> Unit) {
+    val context   = LocalContext.current
     var photoUri  by remember { mutableStateOf<String?>(null) }
     var species   by remember { mutableStateOf("") }
     var location  by remember { mutableStateOf("") }
-    var dateStr   by remember {
+    var dateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
+    var dateStr    by remember {
         mutableStateOf(SimpleDateFormat("dd MMM yyyy", Locale("es")).format(Date()))
     }
+    var showDatePicker  by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = dateMillis)
     var behavior  by remember { mutableStateOf("") }
     var notes     by remember { mutableStateOf("") }
     var tagInput  by remember { mutableStateOf("") }
     var tags      by remember { mutableStateOf<List<String>>(emptyList()) }
 
     val pickPhoto = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
-        uri?.let { photoUri = it.toString() }
+        uri?.let {
+            val dest = File(context.filesDir, "bird_${System.currentTimeMillis()}.jpg")
+            context.contentResolver.openInputStream(it)?.use { src ->
+                dest.outputStream().use { dst -> src.copyTo(dst) }
+            }
+            photoUri = dest.absolutePath
+        }
+    }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { ms ->
+                        dateMillis = ms
+                        dateStr = SimpleDateFormat("dd MMM yyyy", Locale("es")).format(Date(ms))
+                    }
+                    showDatePicker = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
+            }
+        ) { DatePicker(state = datePickerState) }
     }
 
     Column(
@@ -158,7 +193,24 @@ fun AddScreen(vm: BirdViewModel, onClose: () -> Unit) {
             Spacer(Modifier.height(14.dp))
             AddField("Lugar", location, { location = it }, "Ej. Parque del Retiro")
             Spacer(Modifier.height(14.dp))
-            AddField("Fecha", dateStr, { dateStr = it }, "dd mmm yyyy")
+            FieldLabel("Fecha")
+            Spacer(Modifier.height(4.dp))
+            OutlinedTextField(
+                value = dateStr,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(Icons.Outlined.DateRange, contentDescription = null, tint = InkSoft)
+                    }
+                },
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Moss300,
+                    unfocusedBorderColor = Line
+                )
+            )
             Spacer(Modifier.height(14.dp))
             AddField("Comportamiento", behavior, { behavior = it }, "Qué estaba haciendo…")
             Spacer(Modifier.height(14.dp))
@@ -252,21 +304,18 @@ fun AddScreen(vm: BirdViewModel, onClose: () -> Unit) {
             // Save
             Button(
                 onClick = {
-                    val sdf = SimpleDateFormat("dd MMM yyyy", Locale("es"))
-                    val date = try { sdf.parse(dateStr)?.time ?: System.currentTimeMillis() }
-                              catch (_: Exception) { System.currentTimeMillis() }
                     vm.upsertBird(
                         Bird(
-                            species  = species.trim().ifEmpty { null },
-                            sci      = null,
-                            photoUri = photoUri ?: "",
-                            dateMillis = date,
-                            dateStr  = dateStr,
-                            location = location.trim().ifEmpty { "Sin especificar" },
-                            locShort = location.trim().take(14).ifEmpty { "Desconocido" },
-                            behavior = behavior.trim(),
-                            notes    = notes.trim(),
-                            tags     = tags
+                            species    = species.trim().ifEmpty { null },
+                            sci        = null,
+                            photoUri   = photoUri ?: "",
+                            dateMillis = dateMillis,
+                            dateStr    = dateStr,
+                            location   = location.trim().ifEmpty { "Sin especificar" },
+                            locShort   = location.trim().smartTake(14).ifEmpty { "Desconocido" },
+                            behavior   = behavior.trim(),
+                            notes      = notes.trim(),
+                            tags       = tags
                         )
                     )
                     onClose()
@@ -295,6 +344,13 @@ fun AddScreen(vm: BirdViewModel, onClose: () -> Unit) {
             Spacer(Modifier.height(28.dp))
         }
     }
+}
+
+private fun String.smartTake(max: Int): String {
+    if (length <= max) return this
+    val cut = substring(0, max)
+    val lastSpace = cut.lastIndexOf(' ')
+    return if (lastSpace > max / 2) cut.substring(0, lastSpace) else cut
 }
 
 @Composable

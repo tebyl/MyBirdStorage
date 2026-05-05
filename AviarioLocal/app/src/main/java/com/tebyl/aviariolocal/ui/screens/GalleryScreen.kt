@@ -238,7 +238,9 @@ private fun GalleryCard(bird: Bird, index: Int, onClick: () -> Unit) {
         Column {
             AsyncImage(
                 model = bird.photoUri,
-                contentDescription = bird.species,
+                contentDescription = bird.species
+                    ?.let { "Foto de $it en ${bird.location}" }
+                    ?: "Ave sin identificar en ${bird.location}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()

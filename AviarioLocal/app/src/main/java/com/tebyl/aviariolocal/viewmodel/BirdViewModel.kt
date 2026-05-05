@@ -20,11 +20,12 @@ class BirdViewModel(private val repo: BirdRepository) : ViewModel() {
     val filteredBirds: StateFlow<List<Bird>> = combine(
         allBirds, searchQuery, quickFilter, activeTags
     ) { birds, query, filter, tags ->
+        val recentIds = if (filter == "recent") birds.take(5).mapTo(HashSet()) { it.id } else emptySet()
         birds.filter { bird ->
             val passFilter = when (filter) {
                 "fav"    -> bird.isFavorite
                 "unid"   -> bird.species == null
-                "recent" -> birds.indexOf(bird) < 5
+                "recent" -> bird.id in recentIds
                 else     -> true
             }
             val passTag = tags.isEmpty() || tags.any { it in bird.tags }
@@ -46,6 +47,11 @@ class BirdViewModel(private val repo: BirdRepository) : ViewModel() {
                 .map { it.key }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun getBirdById(id: Long): StateFlow<Bird?> =
+        allBirds
+            .map { list -> list.find { it.id == id } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun toggleFavorite(bird: Bird) {
         viewModelScope.launch { repo.setFavorite(bird.id, !bird.isFavorite) }

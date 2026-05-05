@@ -17,15 +17,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import android.content.Intent
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,8 +60,9 @@ import com.tebyl.aviariolocal.viewmodel.BirdViewModel
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailScreen(id: Long, vm: BirdViewModel, onBack: () -> Unit) {
-    val birds by vm.allBirds.collectAsState()
-    val bird = birds.find { it.id == id } ?: return
+    val ctx = LocalContext.current
+    val birdState by remember(id) { vm.getBirdById(id) }.collectAsState()
+    val bird = birdState ?: return
 
     Column(
         modifier = Modifier
@@ -110,7 +114,14 @@ fun DetailScreen(id: Long, vm: BirdViewModel, onBack: () -> Unit) {
                             tint = if (bird.isFavorite) AccentRed else Color.White
                         )
                     }
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        val text = "${bird.species ?: "Ave sin identificar"} · ${bird.location} · ${bird.dateStr}"
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, text)
+                        }
+                        ctx.startActivity(Intent.createChooser(intent, "Compartir observación"))
+                    }) {
                         Icon(Icons.Outlined.Share, "Compartir", tint = Color.White)
                     }
                 }

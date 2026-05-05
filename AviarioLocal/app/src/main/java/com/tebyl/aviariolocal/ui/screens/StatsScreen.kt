@@ -52,6 +52,7 @@ import com.tebyl.aviariolocal.ui.theme.Moss700
 import com.tebyl.aviariolocal.ui.theme.Moss900
 import com.tebyl.aviariolocal.viewmodel.BirdViewModel
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -61,11 +62,27 @@ fun StatsScreen(vm: BirdViewModel) {
     val birds by vm.allBirds.collectAsState()
     val tags  by vm.allTags.collectAsState()
 
-    val total        = birds.size
-    val uniqueSpecies = birds.mapNotNull { it.species }.distinct().size
-    val favCount     = birds.count { it.isFavorite }
-    val locationCount = birds.map { it.locShort }.distinct().size
-    val unidCount    = birds.count { it.species == null }
+    val now    = Calendar.getInstance()
+    val thisYear = now.get(Calendar.YEAR)
+    val season = when (now.get(Calendar.MONTH)) {
+        in 2..4  -> "primavera"
+        in 5..7  -> "verano"
+        in 8..10 -> "otoño"
+        else     -> "invierno"
+    }
+
+    val birdsThisYear = birds.filter { bird ->
+        Calendar.getInstance().run {
+            timeInMillis = bird.dateMillis
+            get(Calendar.YEAR) == thisYear
+        }
+    }
+
+    val total         = birdsThisYear.size
+    val uniqueSpecies = birdsThisYear.mapNotNull { it.species }.distinct().size
+    val favCount      = birdsThisYear.count { it.isFavorite }
+    val locationCount = birdsThisYear.map { it.locShort }.distinct().size
+    val unidCount     = birdsThisYear.count { it.species == null }
 
     val monthlyMap = birds
         .groupBy { SimpleDateFormat("MMM yy", Locale("es")).format(Date(it.dateMillis)) }
@@ -97,7 +114,7 @@ fun StatsScreen(vm: BirdViewModel) {
                         lineHeight = 36.sp
                     )
                 }
-                Stamp(text = "primavera\n2026", color = Moss600, rotation = -10f)
+                Stamp(text = "$season\n$thisYear", color = Moss600, rotation = -10f)
             }
 
             Spacer(Modifier.height(22.dp))
